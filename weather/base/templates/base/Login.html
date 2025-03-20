@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,6 +6,8 @@
     <link href="favicon.ico" rel="icon" type="image/x-icon" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'style.css'%}">
+    <link href="{% static 'favicon.ico' %}" rel="icon" type="image/x-icon" />
     <link rel="stylesheet" href="style.css">
     <title>Login</title>
 </head>
@@ -17,7 +20,7 @@
         <div class="nav-right">
             <ul>
                 <li><a href="Register_page.html">Register</a></li>
-                <li><a href="Login.html">Login</a></li>
+                <li><a href="{%url 'login'%}">Login</a></li>
             </ul>
         </div>
     </nav>

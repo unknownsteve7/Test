@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
     <title>Dynamic Weather App</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+=======
+    <title>Weather</title>
+>>>>>>> 2eaf58d098475cbb9f3c803d31633e43082eeb70
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -85,9 +89,51 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        #search-form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #location-input {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        #search-form button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #0072ff;
+            color: white;
+            cursor: pointer;
+        }
+
+        #search-form button:hover {
+            background-color: #005bb5;
+        }
+
+        .auth-links {
+            margin-top: 20px;
+        }
+
+        .auth-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
+<<<<<<< HEAD
     <div class="container">
         <h1 class="fade-in">Weather App</h1>
         <div class="search-box slide-in">
@@ -115,6 +161,28 @@
                 alert("Please enter a city name");
                 return;
             }
+=======
+    <div id="weather-app">
+        <h1>Weather App</h1>
+        <form id="search-form">
+            <input type="text" id="location-input" placeholder="Enter location" required>
+            <button type="submit">Search</button>
+        </form>
+        <div id="location"></div>
+        <div id="temperature"></div>
+        <div id="description"></div>
+        <div id="icon"></div>
+        <div class="auth-links">
+            <a href="{%url 'login'%}">Login</a>
+            <a href="register.html">Register</a>
+        </div>
+    </div>
+    <script>
+        async function fetchWeather(location) {
+            const apiKey = '05f00bfa923cbb402577e6b98dc4d536';
+            const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`);
+            const data = await response.json();
+>>>>>>> 2eaf58d098475cbb9f3c803d31633e43082eeb70
             
             fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
                 .then(response => {
@@ -136,6 +204,18 @@
                     document.getElementById("weatherData").innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
                 });
         }
+<<<<<<< HEAD
+=======
+
+        document.getElementById('search-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const location = document.getElementById('location-input').value;
+            fetchWeather(location);
+        });
+
+        // Fetch weather for default location on page load
+        fetchWeather(location);
+>>>>>>> 2eaf58d098475cbb9f3c803d31633e43082eeb70
     </script>
 </body>
 </html>

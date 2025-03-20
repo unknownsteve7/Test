@@ -1,0 +1,5 @@
+Django>=4.2
+djangorestframework
+pillow  # For image uploads
+gunicorn  # If deploying on a server
+psycopg2  # PostgreSQL support (remove if using SQLite)
