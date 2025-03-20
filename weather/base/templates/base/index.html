@@ -50,7 +50,7 @@
     <script>
         async function fetchWeather() {
             const apiKey = '05f00bfa923cbb402577e6b98dc4d536';
-            const location = 'Delhi';
+            const location = 'Vijayawada';
             const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`);
             const data = await response.json();
             
