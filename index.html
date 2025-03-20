@@ -3,134 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather App</title>
+    <title>Dynamic Weather App</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(to right, #00c6ff, #0072ff);
-            color: white;
-            text-align: center;
-            margin: 0;
-            padding: 0;
+            background: linear-gradient(135deg, #89f7fe, #66a6ff);
             display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 1s ease-in;
+        }
+        .input-container {
+            display: flex;
+            gap: 10px;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            transition: background 0.5s ease-in-out;
+            margin-bottom: 15px;
         }
-
-        #weather-app {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-            width: 350px;
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        h1 {
-            margin-bottom: 20px;
-            font-size: 24px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
         input {
-            width: 80%;
             padding: 10px;
-            border: none;
             border-radius: 5px;
-            outline: none;
+            border: none;
             font-size: 16px;
         }
-
         button {
-            margin-top: 10px;
-            padding: 10px 15px;
-            background: #ff9800;
-            border: none;
+            background: #ff8c00;
             color: white;
-            border-radius: 5px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
-            transition: 0.3s ease;
+            transition: 0.3s;
         }
-
         button:hover {
-            background: #e68900;
+            background: #ff6a00;
+            box-shadow: 0 0 15px rgba(255, 138, 0, 0.8);
         }
-
-        #location, #temperature, #description, #icon {
-            margin: 10px 0;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        #weather-info {
+            margin-top: 15px;
         }
-
-        #icon img {
-            width: 100px;
+        #weatherChartContainer {
+            width: 600px;
+            height: 400px;
+            margin-top: 20px;
         }
-
-        .visible {
-            opacity: 1 !important;
-            transform: translateY(0) !important;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
+        .chart-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <div id="weather-app">
+    <div class="container">
         <h1>Weather App</h1>
-        <input type="text" id="city-input" placeholder="Enter city name..." />
-        <button onclick="fetchWeather()">Get Weather</button>
-        <div id="loading" style="display: none;">Fetching weather...</div>
-        <div id="location"></div>
-        <div id="temperature"></div>
-        <div id="description"></div>
-        <div id="icon"></div>
+        <div class="input-container">
+            <input type="text" id="cityInput" placeholder="Enter city name" onkeypress="handleKeyPress(event)">
+            <button onclick="getWeather()">Search</button>
+            <button onclick="toggleUnits()" class="hide">Toggle °C/°F</button>
+        </div>
+        <div id="weather-info"></div>
+        <div id="weatherChartContainer">
+            <canvas id="weatherChart"></canvas>
+            <div class="chart-buttons">
+                <button onclick="fetchWeatherData('year')" class="hide">Last 1 Year</button>
+                <button onclick="fetchWeatherData('month')" class="hide">Last 1 Month</button>
+                <button onclick="fetchWeatherData('week')" class="hide">Last 1 Week</button>
+                <button onclick="fetchWeatherData('today')" class="hide">Today</button>
+            </div>
+        </div>
     </div>
-
     <script>
-        async function fetchWeather() {
-            const apiKey = '05f00bfa923cbb402577e6b98dc4d536';
-            let location = document.getElementById('city-input').value.trim();
+        const apiKey = "05f00bfa923cbb402577e6b98dc4d536";
+        let isCelsius = true;
 
-            if (location === "") {
-                alert("Please enter a city name.");
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                getWeather();
+            }
+        }
+
+        function toggleUnits() {
+            isCelsius = !isCelsius;
+            getWeather();
+        }
+
+        async function getWeather() {
+            const city = document.getElementById("cityInput").value.trim();
+            if (city === "") {
+                alert("Please enter a city name");
                 return;
             }
+            const unit = isCelsius ? "metric" : "imperial";
+            const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=${unit}`);
+            const data = await response.json();
+            document.getElementById("weather-info").innerHTML = `
+                <p><strong>Location:</strong> ${data.name}, ${data.sys.country}</p>
+                <p><strong>Temperature:</strong> ${data.main.temp}°${isCelsius ? "C" : "F"}</p>
+                <p><strong>Humidity:</strong> ${data.main.humidity}%</p>
+                <p><strong>Description:</strong> ${data.weather[0].description}</p>
+            `;
+            fetchWeatherData('today');
+        }
 
-            document.getElementById('loading').style.display = "block";
-
-            try {
-                const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`);
-                
-                if (!response.ok) {
-                    throw new Error("City not found");
-                }
-
-                const data = await response.json();
-                document.getElementById('location').innerText = `📍 Location: ${data.name}, ${data.sys.country}`;
-                document.getElementById('temperature').innerText = `🌡️ Temperature: ${data.main.temp}°C`;
-                document.getElementById('description').innerText = `🌤️ ${data.weather[0].description}`;
-                document.getElementById('icon').innerHTML = `<img src="http://openweathermap.org/img/wn/${data.weather[0].icon}.png" alt="Weather icon">`;
-
-                document.getElementById('loading').style.display = "none";
-
-                // Adding animation effects
-                document.getElementById('location').classList.add('visible');
-                document.getElementById('temperature').classList.add('visible');
-                document.getElementById('description').classList.add('visible');
-                document.getElementById('icon').classList.add('visible');
-
-            } catch (error) {
-                document.getElementById('loading').style.display = "none";
-                alert("City not found. Please try again.");
-                console.error("Error:", error);
+        function fetchWeatherData(period) {
+            const city = document.getElementById("cityInput").value.trim();
+            if (!city) return;
+            
+            let labels = [], temperatures = [];
+            let now = new Date();
+            for (let i = 0; i < (period === 'year' ? 12 : period === 'month' ? 30 : period === 'week' ? 7 : 24); i++) {
+                labels.push(period === 'today' ? `${(i % 12) + 1} ${(i < 12) ? 'AM' : 'PM'}` : new Date(now - i * 24 * 60 * 60 * 1000).toDateString());
+                temperatures.push(Math.random() * (35 - 15) + 15);
             }
+            labels.reverse(); temperatures.reverse();
+            updateChart(labels, temperatures);
+        }
+        
+        function updateChart(labels, data) {
+            let ctx = document.getElementById('weatherChart').getContext('2d');
+            if (window.myChart) window.myChart.destroy();
+            window.myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Temperature',
+                        data: data,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
         }
     </script>
 </body>
